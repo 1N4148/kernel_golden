@@ -124,9 +124,9 @@ static void blink_thread(void)
 	while(bln_suspended)
 	{
 		bln_enable_backlights(get_led_mask());
-		msleep(1000);
+		msleep(750);
 		bln_disable_backlights(get_led_mask());
-		msleep(1000);
+		msleep(4250);
 	}
 }
 
