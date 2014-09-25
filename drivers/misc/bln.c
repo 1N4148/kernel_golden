@@ -164,10 +164,15 @@ static void disable_led_notification(void)
 {
 	if (bln_suspended && bln_ongoing) {
 		bln_disable_backlights(gen_all_leds_mask());
+		bln_power_off();
 	}
 
-	bln_power_off();
 	reset_bln_states();
+#ifdef CONFIG_GENERIC_BLN_USE_WAKELOCK
+	if(wake_lock_active(&bln_wake_lock)){
+		wake_unlock(&bln_wake_lock);
+	}
+#endif
 
 	pr_info("%s: notification led disabled\n", __FUNCTION__);
 }
