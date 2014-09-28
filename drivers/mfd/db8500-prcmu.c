@@ -9,6 +9,10 @@
  *
  * U8500 PRCM Unit interface driver
  *
+ *
+ * DB8500 LiveOPP Supports:
+ * Huang Ji (cocafe@xda-developers.com) <cocafehj@gmail.com>
+ *
  */
 
 #include <linux/module.h>
@@ -457,7 +461,7 @@ static DEFINE_SPINLOCK(clkout_lock);
 
 /* Global var to runtime determine TCDM base for v2 or v1 */
 static __iomem void *tcdm_base;
-
+static __iomem void *prcmu_base;
 /*
  * Copies of the startup values of the reset status register and the SW reset
  * code.
@@ -688,6 +692,39 @@ static void db8500_prcmu_write_masked(unsigned int reg, u32 mask, u32 value)
 	spin_unlock_irqrestore(&prcmu_lock, flags);
 }
 
+u32 db8500_prcmu_readl(u32 reg)
+{
+	return readl(prcmu_base + reg);
+}
+
+void db8500_prcmu_writel(u32 reg, u32 value)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&prcmu_lock, flags);
+	writel(value, prcmu_base + reg);
+	spin_unlock_irqrestore(&prcmu_lock, flags);
+}
+
+void db8500_prcmu_writel_relaxed(u32 reg, u32 value)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&prcmu_lock, flags);
+	writel_relaxed(value, prcmu_base + reg);
+	spin_unlock_irqrestore(&prcmu_lock, flags);
+}
+
+u32 db8500_prcmu_tcdm_readl(u32 reg)
+{
+	return readl(tcdm_base + reg);
+}
+
+void db8500_prcmu_tcdm_writel(u32 reg, u32 value)
+{
+	writel(value, tcdm_base + reg);
+}
+
 /*
  * Dump AB8500 registers, PRCMU registers and PRCMU data memory
  * on critical errors.
@@ -756,13 +793,13 @@ bool prcmu_is_ulppll_disabled(void)
 
 /*  frequency available  */
 static struct cpufreq_frequency_table *freq_table;
-
+#ifndef CONFIG_DB8500_LIVEOPP
 static bool db8500_prcmu_has_arm_maxopp(void)
 {
 	return (readb(tcdm_base + PRCM_AVS_VARM_MAX_OPP) &
 		PRCM_AVS_ISMODEENABLE_MASK) == PRCM_AVS_ISMODEENABLE_MASK;
 }
-
+#endif /* CONFIG_DB8500_LIVEOPP */
 static void db8500_prcmu_vc(bool enable)
 {
 	writel((enable ? 0xF : 0), (tcdm_base + PRCM_TCDM_VOICE_CALL_FLAG));
@@ -1007,6 +1044,61 @@ static void db8500_prcmu_get_abb_event_buffer(void __iomem **buf)
 		*buf = (tcdm_base + PRCM_ACK_MB0_WAKEUP_0_4500);
 }
 
+#ifdef CONFIG_DB8500_LIVEOPP
+#include <linux/kobject.h>
+#include <linux/mfd/db8500-liveopp.h>
+
+#define LiveOPP_VER "0.9.9"
+
+#define NO_CHANGE 0
+#define SET_PLLARM 1
+#define SET_EXTARM 1
+#define SET_VOLT 1
+
+static unsigned int last_arm_idx = 0;
+
+/**
+ * Hard-coded Custom ARM Frequency and Voltage Table
+ */
+static struct liveopp_arm_table liveopp_arm[] = {
+	{100000, 99840, ARM_EXTCLK, SET_EXTARM, 0x582, NO_CHANGE, 0x00050168, NO_CHANGE, 0x0C, 0x18, 0xDB},
+	{200000, 192000, ARM_EXTCLK, NO_CHANGE, 0x00000581, NO_CHANGE, 0x00050168, NO_CHANGE, 0x0C, 0x18, 0xDB},
+	{400000, 399360, ARM_50_OPP, NO_CHANGE, 0x00000741, SET_PLLARM, 0x01050168, NO_CHANGE, 0x0C, 0x1A, 0xDB},
+	{600000, 599040, ARM_50_OPP, NO_CHANGE, 0x00000741, SET_PLLARM, 0x0005014E, NO_CHANGE, 0x0C, 0x20, 0xDB},
+	{800000, 798720, ARM_100_OPP, NO_CHANGE, 0x00000741, SET_PLLARM, 0x00050168, NO_CHANGE, 0x0B, 0x24, 0xDB},
+	{1000000, 998400, ARM_MAX_OPP, NO_CHANGE, 0x00000741, NO_CHANGE, 0x0001011A, NO_CHANGE, 0x0B, 0x2F, 0xDB},
+};
+
+static void liveopp_set_armvolt(struct liveopp_arm_table table)
+{
+	/* Varm */
+	prcmu_abb_write(AB8500_REGU_CTRL2, table.varm_sel, &table.varm_raw, 1);
+
+	/* VBBp/VBBn */
+	prcmu_abb_write(AB8500_REGU_CTRL2, AB8500_VBBX_REG, &table.vbbx_raw, 1);
+}
+
+static void liveopp_set_armfreq(struct liveopp_arm_table table)
+{
+	/* ArmFixClk */ /* Not used now! */
+	/* db8500_prcmu_writel(PRCMU_ARMFIX_REG, table.extarm_raw); */
+
+	/* ARM PLL */
+	db8500_prcmu_writel(PRCMU_PLLARM_REG, table.pllarm_raw);
+}
+
+static void liveopp_update_arm(struct liveopp_arm_table table)
+{
+	if (table.set_volt)
+	liveopp_set_armvolt(table);
+
+	if (table.set_pllarm)
+	liveopp_set_armfreq(table);
+}
+
+#endif /* CONFIG_DB8500_LIVEOPP */
+
+#ifndef CONFIG_DB8500_LIVEOPP
 /* db8500-prcmu : hard coded conversion */
 static enum arm_opp db8500_idx2opp[] = {
 	ARM_EXTCLK,
@@ -1014,7 +1106,7 @@ static enum arm_opp db8500_idx2opp[] = {
 	ARM_100_OPP,
 	ARM_MAX_OPP
 };
-
+#endif /* CONFIG_DB8500_LIVEOPP */
 #define SET_ARM_OPP_TIMEOUT HZ
 
 /**
@@ -1062,6 +1154,44 @@ static int db8500_prcmu_set_arm_opp(u8 opp)
 	return r;
 }
 
+static int db8500_prcmu_set_arm_lopp(u8 opp, int idx)
+{
+	int r;
+
+	if (opp < ARM_NO_CHANGE || opp > ARM_EXTCLK)
+		return -EINVAL;
+
+	trace_u8500_set_arm_opp(opp);
+	r = 0;
+
+	mutex_lock(&mb1_transfer.lock);
+
+	while (readl(PRCM_MBOX_CPU_VAL) & MBOX_BIT(1))
+	cpu_relax();
+
+	writeb(MB1H_ARM_APE_OPP, (tcdm_base + PRCM_MBOX_HEADER_REQ_MB1));
+	writeb(opp, (tcdm_base + PRCM_REQ_MB1_ARM_OPP));
+	writeb(APE_NO_CHANGE, (tcdm_base + PRCM_REQ_MB1_APE_OPP));
+
+	log_this(120, "OPP", opp, NULL, 0);
+	writel(MBOX_BIT(1), PRCM_MBOX_CPU_SET);
+	wait_for_completion_timeout(&mb1_transfer.work, SET_ARM_OPP_TIMEOUT);
+
+	if ((mb1_transfer.ack.header != MB1H_ARM_APE_OPP) ||
+	    (mb1_transfer.ack.arm_opp != opp)) {
+		pr_err("%s: error: timed out (%ds)\n", __func__,
+			SET_ARM_OPP_TIMEOUT / HZ);
+		r = -EIO;
+	}
+	liveopp_update_arm(liveopp_arm[idx]);
+	compute_armss_rate();
+	mutex_unlock(&mb1_transfer.lock);
+
+	prcmu_debug_arm_opp_log(opp);
+
+	return r;
+}
+
 /**
  * db8500_prcmu_get_arm_opp - get the current ARM OPP
  *
@@ -1071,6 +1201,20 @@ static int db8500_prcmu_get_arm_opp(void)
 {
 	return readb(tcdm_base + PRCM_ACK_MB1_CURRENT_ARM_OPP);
 }
+
+#ifdef CONFIG_DB8500_LIVEOPP
+static unsigned long arm_get_rate(void)
+{
+	unsigned long rate;
+
+	/* catch early access */
+	BUG_ON(!freq_table);
+
+	rate = freq_table[last_arm_idx].frequency;
+
+	return rate * 1000;
+}
+#else
 
 static unsigned long arm_get_rate(void)
 {
@@ -1092,8 +1236,32 @@ static unsigned long arm_get_rate(void)
 	rate =  freq_table[found].frequency;
 	return rate * 1000;
 }
+#endif /* CONFIG_DB8500_LIVEOPP */
 unsigned long (*toto)(void);
+#ifdef CONFIG_DB8500_LIVEOPP
+static int arm_set_rate(unsigned long rate)
+{
+	unsigned long frequency = rate / 1000;
+	int i;
 
+	/* catch early access */
+	BUG_ON(!freq_table);
+
+	for (i = 0; i < ARRAY_SIZE(liveopp_arm); i++) {
+		if (frequency == freq_table[i].frequency) {
+			if (db8500_prcmu_get_arm_opp() == ARM_MAX_OPP) {
+				db8500_prcmu_writel(PRCMU_PLLARM_REG, PLLARM_MAXOPP);
+			}
+			db8500_prcmu_set_arm_lopp(liveopp_arm[i].arm_opp, i);
+			last_arm_idx = i;
+
+			break;
+		}
+	}
+
+	return 0;
+}
+#else
 static int arm_set_rate(unsigned long rate)
 {
 	unsigned long frequency = rate / 1000;
@@ -1111,7 +1279,7 @@ static int arm_set_rate(unsigned long rate)
 		return db8500_prcmu_set_arm_opp(db8500_idx2opp[found]);
 	return -1;
 }
-
+#endif /* CONFIG_DB8500_LIVEOPP */
 /**
  * db8500_prcmu_get_ddr_opp - get the current DDR OPP
  *
@@ -3649,6 +3817,7 @@ struct prcmu_fops_register_data *__init db8500_prcmu_early_init(void)
 			fw_ver->errata);
 
 	tcdm_base = __io_address(U8500_PRCMU_TCDM_BASE);
+	prcmu_base = __io_address(U8500_PRCMU_BASE);
 
 	/*
 	 * Copy the value of the reset status register and if needed also
@@ -4018,8 +4187,18 @@ static struct cpufreq_frequency_table *freq_table;
 
 static void  db8500_prcmu_update_freq(void *pdata)
 {
+	#ifdef CONFIG_DB8500_LIVEOPP
+	int i;
+	#endif /* CONFIG_DB8500_LIVEOPP */
 	freq_table =
 		(struct cpufreq_frequency_table *)pdata;
+
+	#ifdef CONFIG_DB8500_LIVEOPP
+	pr_info("[LiveOPP] Available freqs: %d\n", ARRAY_SIZE(liveopp_arm));
+	for (i = 0; i < ARRAY_SIZE(liveopp_arm); i++) {
+		freq_table[i].frequency = liveopp_arm[i].freq_show;
+	}
+	#else /* CONFIG_DB8500_LIVEOPP */
 	if  (!db8500_prcmu_has_arm_maxopp())
 		return;
 	switch (fw_info.version.project) {
@@ -4038,7 +4217,7 @@ static void  db8500_prcmu_update_freq(void *pdata)
 	default:
 		break;
 	}
-
+	#endif /* CONFIG_DB8500_LIVEOPP */
 }
 
 
