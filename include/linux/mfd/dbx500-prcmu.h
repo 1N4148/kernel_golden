@@ -189,6 +189,7 @@ enum prcmu_clock {
 	PRCMU_DSI0ESCCLK_LCD,
 	PRCMU_DSI1ESCCLK_LCD,
 	PRCMU_DSI2ESCCLK_LCD,
+	PRCMU_PLLARM,
 };
 
 /**
@@ -379,6 +380,20 @@ u32 prcmu_read(unsigned int reg);
 void prcmu_write(unsigned int reg, u32 value);
 
 void prcmu_write_masked(unsigned int reg, u32 mask, u32 value);
+
+u32 db8500_prcmu_readl(u32 reg);
+
+void db8500_prcmu_writel(u32 reg, u32 value);
+
+void db8500_prcmu_writel_relaxed(u32 reg, u32 value);
+
+u32 db8500_prcmu_tcdm_readl(u32 reg);
+
+void db8500_prcmu_tcdm_writel(u32 reg, u32 value);
+
+u32 db8500_prcmu_tcdm_readb(u32 reg);
+
+void db8500_prcmu_tcdm_writeb(u32 reg, u32 value);
 
 int prcmu_stay_in_wfi_check(void);
 
