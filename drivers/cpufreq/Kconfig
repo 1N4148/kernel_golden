@@ -108,13 +108,22 @@ config CPU_FREQ_DEFAULT_GOV_INTERACTIVE
 	  you to get a full dynamic cpu frequency capable system by simply
 	  loading your cpufreq low-level hardware driver, using the
 	  'interactive' governor for latency-sensitive workloads.
-      
+
+config CPU_FREQ_DEFAULT_GOV_INTELLIACTIVE
+	bool "intelliactive"
+	select CPU_FREQ_GOV_INTELLIACTIVE
+	help
+	  Use the CPUFreq governor 'intelliactive' as default. This allows
+	  you to get a full dynamic cpu frequency capable system by simply
+	  loading your cpufreq low-level hardware driver, using the
+	  'interactive' governor for latency-sensitive workloads.
+
 config CPU_FREQ_DEFAULT_GOV_PEGASUSQ
 	bool "pegasusq"
 	select CPU_FREQ_GOV_PEGASUSQ
 	help
 	  Use the CPUFreq governor 'pegasusq' as default.
-         
+
 config CPU_FREQ_DEFAULT_GOV_ABYSSPLUG
 	bool "abyssplug"
 	select CPU_FREQ_GOV_ABYSSPLUG
@@ -227,24 +236,32 @@ config CPU_FREQ_GOV_INTERACTIVE
 
 	  If in doubt, say N.
 
-config CPU_FREQ_GOV_SAKURACTIVE
-    tristate "'sakuractive' cpufreq governor"
-    depends on CPU_FREQ && NO_HZ && HOTPLUG_CPU
-    help
-      'sakuractive' - this driver mimics the frequency scaling behavior
-      in 'ondemand', but with several key differences. First is
-      that frequency transitions use the CPUFreq table directly,
-      instead of incrementing in a percentage of the maximum
-      available frequency. Second 'sakuractive' will offline auxillary
-      CPUs when the system is idle, and online those CPUs once the
-      system becomes busy again. This last feature is needed for
-      architectures which transition to low power states when only
-      the "master" CPU is online, or for thermally constrained
-      devices.
-      If you don't have one of these architectures or devices, use
-      'ondemand' instead.
+config CPU_FREQ_GOV_INTERACTIVEQ
+	tristate "'interactiveQ' cpufreq policy governor"
+	help
+	  'interactiveQ' - This driver adds a dynamic cpufreq policy governor
+	  designed for latency-sensitive workloads.
 
-      If in doubt, say N.
+	  This governor attempts to reduce the latency of clock
+	  increases so that the system is more responsive to
+	  interactive workloads.
+
+	  InteractiveQ will hotplug CPU1 when system goes *suspend*.
+
+	  If in doubt, say N.
+
+config CPU_FREQ_GOV_INTELLIACTIVE
+	tristate "'intelliactive' cpufreq policy governor"
+	help
+	  'intelliactive' - This driver adds a dynamic cpufreq policy governor
+	  designed for latency-sensitive workloads.
+	  This governor attempts to reduce the latency of clock
+	  increases so that the system is more responsive to
+	  interactive workloads.
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_interactive.
+	  For details, take a look at linux/Documentation/cpu-freq.
+	  If in doubt, say N.
 
 config CPU_FREQ_GOV_HOTPLUG
        tristate "'hotplug' cpufreq governor"
@@ -271,7 +288,26 @@ config CPU_FREQ_GOV_PEGASUSQ
     depends on CPU_FREQ
     help
 	  Very good governor.
-      
+
+config CPU_FREQ_GOV_SAKURACTIVE
+    tristate "'sakuractive' cpufreq governor"
+    depends on CPU_FREQ && NO_HZ && HOTPLUG_CPU
+    help
+      'sakuractive' - this driver mimics the frequency scaling behavior
+      in 'ondemand', but with several key differences. First is
+      that frequency transitions use the CPUFreq table directly,
+      instead of incrementing in a percentage of the maximum
+      available frequency. Second 'sakuractive' will offline auxillary
+      CPUs when the system is idle, and online those CPUs once the
+      system becomes busy again. This last feature is needed for
+      architectures which transition to low power states when only
+      the "master" CPU is online, or for thermally constrained
+      devices.
+      If you don't have one of these architectures or devices, use
+      'ondemand' instead.
+
+      If in doubt, say N.
+
 config CPU_FREQ_GOV_ABYSSPLUG
     tristate "'abyssplug' cpufreq governor"
     depends on CPU_FREQ
