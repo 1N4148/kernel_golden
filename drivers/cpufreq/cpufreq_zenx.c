@@ -1173,7 +1173,7 @@ static struct attribute *zenx_attributes[] = {
 
 static struct attribute_group zenx_attr_group = {
 	.attrs = zenx_attributes,
-	.name = "zenx",
+	.name = "ZenX",
 };
 
 static int cpufreq_zenx_idle_notifier(struct notifier_block *nb,
