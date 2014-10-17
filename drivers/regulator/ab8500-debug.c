@@ -2187,7 +2187,7 @@ static ssize_t abb_regu_votg_store(struct kobject *kobj, struct kobj_attribute *
 	return count;
 }
 
-static struct kobj_attribute abb_regu_votg_interface = __ATTR(votg, 0644, abb_regu_votg_show, abb_regu_votg_store);
+static struct kobj_attribute abb_regu_votg_interface = __ATTR(VOTG, 0644, abb_regu_votg_show, abb_regu_votg_store);
 
 static struct attribute *abb_regu_attrs[] = {
 	&abb_regu_votg_interface.attr, 
