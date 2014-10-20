@@ -17,6 +17,7 @@ obj-$(CONFIG_CPU_FREQ_GOV_SAKURACTIVE)	+= cpufreq_sakuractive.o
 obj-$(CONFIG_CPU_FREQ_GOV_INTELLIACTIVE)+= cpufreq_intelliactive.o
 obj-$(CONFIG_CPU_FREQ_GOV_ZENERACTIVE)  += cpufreq_zeneractive.o
 obj-$(CONFIG_CPU_FREQ_GOV_ZENX)    	+= cpufreq_zenx.o
+obj-$(CONFIG_CPU_FREQ_GOV_LULZACTIVEQ)	+= cpufreq_lulzactiveq.o
 obj-$(CONFIG_CPU_FREQ_GOV_ABYSSPLUG)    += cpufreq_abyssplug.o
 
 # CPUfreq cross-arch helpers
