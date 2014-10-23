@@ -13,6 +13,8 @@
 #include <linux/spinlock.h>
 #include <linux/slab.h>
 #include <linux/io.h>
+#include <linux/sysfs.h>
+#include <linux/kobject.h>
 #include <linux/uaccess.h>
 #include <linux/debugfs.h>
 #include <linux/seq_file.h>
@@ -40,9 +42,9 @@ struct state_history {
 static struct state_history ape_sh = {
 	.name = "APE OPP",
 	.req = PRCMU_QOS_APE_OPP,
-	.opps = {APE_50_OPP, APE_100_OPP},
-	.state_names = {50, 100},
-	.max_states = 2,
+	.opps = {APE_50_PARTLY_25_OPP, APE_50_OPP, APE_100_OPP},
+	.state_names = {25, 50, 100},
+	.max_states = 3,
 };
 
 static struct state_history ddr_sh = {
@@ -202,9 +204,10 @@ static void log_set(struct state_history *sh, u8 opp)
 
 void prcmu_debug_ape_opp_log(u8 opp)
 {
+/*
 	if (opp == APE_50_PARTLY_25_OPP)
 		opp = APE_50_OPP;
-
+*/
 	log_set(&ape_sh, opp);
 }
 
@@ -505,7 +508,11 @@ static int avs_read(struct seq_file *s, void *p)
 	return 0;
 }
 
-static void prcmu_data_mem_print(struct seq_file *s)
+static int dump_long2byte(struct seq_file *s, u32 data) {
+	return seq_printf(s, " 0x%02x 0x%02x 0x%02x 0x%02x", data & 0xff, (data >> 8) & 0xff, (data >> 16) & 0xff, (data >> 24) & 0xff);
+}
+
+static void prcmu_data_mem_print(struct seq_file *s, char width)
 {
 	int i;
 	int err;
@@ -522,9 +529,16 @@ static void prcmu_data_mem_print(struct seq_file *s)
 			dmem[3] = readl(tcdm_base + i + 12);
 
 			if (s) {
-				err = seq_printf(s,
+				if (width == 1) {
+					err = seq_printf(s, "0x%x:", i);
+					dump_long2byte(s, dmem[0]);
+					dump_long2byte(s, dmem[1]);
+					dump_long2byte(s, dmem[2]);
+					dump_long2byte(s, dmem[3]);
+					err = seq_printf(s, "\n");
+				} else  err = seq_printf(s,
 					"0x%x: 0x%08x 0x%08x 0x%08x 0x%08x\n",
-					((int)tcdm_base) + i, dmem[0],
+					i, dmem[0],
 					dmem[1], dmem[2], dmem[3]);
 				if (err < 0) {
 					pr_err("%s: seq_printf overflow, addr=%x\n",
@@ -545,13 +559,21 @@ static void prcmu_data_mem_print(struct seq_file *s)
 void prcmu_debug_dump_data_mem(void)
 {
 	printk(KERN_INFO "PRCMU data memory dump:\n");
-	prcmu_data_mem_print(NULL);
+	prcmu_data_mem_print(NULL, 4);
 }
 
 static int prcmu_debugfs_data_mem_read(struct seq_file *s, void *p)
 {
 	seq_printf(s, "PRCMU data memory:\n");
-	prcmu_data_mem_print(s);
+	prcmu_data_mem_print(s, 4);
+
+	return 0;
+}
+
+static int prcmu_debugfs_data_mem_readb(struct seq_file *s, void *p)
+{
+	seq_printf(s, "PRCMU data memory:\n");
+	prcmu_data_mem_print(s, 1);
 
 	return 0;
 }
@@ -849,6 +871,25 @@ static int prcmu_data_mem_open_file(struct inode *inode, struct file *file)
 	return err;
 }
 
+static int prcmu_data_memb_open_file(struct inode *inode, struct file *file)
+{
+	int err;
+	struct seq_file *s;
+
+	err = single_open(file, prcmu_debugfs_data_mem_readb, inode->i_private);
+	if (!err) {
+		/* Default buf size in seq_read is not enough */
+		s = (struct seq_file *)file->private_data;
+		s->size = (PAGE_SIZE * 8);
+		s->buf = kmalloc(s->size, GFP_KERNEL);
+		if (!s->buf) {
+			single_release(inode, file);
+			err = -ENOMEM;
+		}
+	}
+	return err;
+}
+
 static int prcmu_regs_open_file(struct inode *inode, struct file *file)
 {
 	int err;
@@ -948,6 +989,14 @@ static const struct file_operations prcmu_data_mem_fops = {
 	.owner = THIS_MODULE,
 };
 
+static const struct file_operations prcmu_data_memb_fops = {
+	.open = prcmu_data_memb_open_file,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = single_release,
+	.owner = THIS_MODULE,
+};
+
 static const struct file_operations prcmu_regs_fops = {
 	.open = prcmu_regs_open_file,
 	.read = seq_read,
@@ -1040,6 +1089,12 @@ static int setup_debugfs(void)
 	if (IS_ERR_OR_NULL(file))
 		goto fail;
 
+	file = debugfs_create_file("data_memb", (S_IRUGO),
+				   dir, NULL,
+				   &prcmu_data_memb_fops);
+	if (IS_ERR_OR_NULL(file))
+		goto fail;
+
 	file = debugfs_create_file("regs", (S_IRUGO),
 				   dir, NULL,
 				   &prcmu_regs_fops);
@@ -1067,7 +1122,8 @@ fail:
 	return -ENOMEM;
 }
 
-static int reg_last = 0;
+static u32 prcmu_rreg_last = 0;
+static u32 prcmu_wreg_last = 0;
 
 static ssize_t prcmu_wreg_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
 {
@@ -1075,9 +1131,9 @@ static ssize_t prcmu_wreg_show(struct kobject *kobj, struct kobj_attribute *attr
 	void __iomem *prcmu_base;
 
 	prcmu_base = __io_address(U8500_PRCMU_BASE);
-	reg_val = readl(prcmu_base + reg_last);
+	reg_val = readl(prcmu_base + prcmu_wreg_last);
 
-	sprintf(buf, "%#06x %#010x\n", reg_last, reg_val);
+	sprintf(buf, "%#06x %#010x\n", prcmu_wreg_last, reg_val);
 
 	return strlen(buf);
 }
@@ -1086,30 +1142,140 @@ static ssize_t prcmu_wreg_store(struct kobject *kobj, struct kobj_attribute *att
 {
 	int reg, val, err;
 	void __iomem *prcmu_base;
-	
-	/* HEX */
+
 	err = sscanf(buf, "%x %x", &reg, &val);
 
 	if (!err) {
-		pr_err("prcmu-dbg: invalid inputs\n");
+		pr_err("[prcmu-dbg] invalid inputs\n");
 		return -EINVAL;
 	}
 
 	prcmu_base = __io_address(U8500_PRCMU_BASE);
 
-	reg_last = reg;
+	prcmu_wreg_last = reg;
 
-	pr_info("[PRCMU DBG] %#06x: %#010x\n", reg, val);
+	pr_info("[prcmu-dbg] %#06x: %#010x\n", reg, val);
 
 	writel(val, prcmu_base + reg);
 	
 	return count;
 }
 
-static struct kobj_attribute prcmu_wreg_interface = __ATTR(wreg, 0600, prcmu_wreg_show, prcmu_wreg_store);
+static struct kobj_attribute prcmu_wreg_interface = __ATTR(prcmu_wreg, 0600, prcmu_wreg_show, prcmu_wreg_store);
+
+static ssize_t prcmu_rreg_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	int reg_val;
+	void __iomem *prcmu_base;
+
+	prcmu_base = __io_address(U8500_PRCMU_BASE);
+	reg_val = readl(prcmu_base + prcmu_rreg_last);
+
+	sprintf(buf, "%#06x %#010x\n", prcmu_rreg_last, reg_val);
+
+	return strlen(buf);
+}
+
+static ssize_t prcmu_rreg_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
+{
+	int reg;
+
+	if (sscanf(buf, "%x", &reg))
+		prcmu_rreg_last = reg;
+	
+	return count;
+}
+
+static struct kobj_attribute prcmu_rreg_interface = __ATTR(prcmu_rreg, 0600, prcmu_rreg_show, prcmu_rreg_store);
+
+static u32 tcdm_rregb_last;
+static u32 tcdm_wregb_last;
+static u32 tcdm_rregl_last;
+static u32 tcdm_wregl_last;
+
+static ssize_t tcdm_rregb_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	return sprintf(buf, "%#06x %#04x\n", tcdm_rregb_last, db8500_prcmu_tcdm_readb(tcdm_rregb_last));
+}
+
+static ssize_t tcdm_rregb_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
+{
+	int reg;
+
+	if (sscanf(buf, "%x", &reg))
+		tcdm_rregb_last = reg;
+	
+	return count;
+}
+
+static struct kobj_attribute tcdm_rregb_interface = __ATTR(tcdm_rregb, 0600, tcdm_rregb_show, tcdm_rregb_store);
+
+static ssize_t tcdm_wregb_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	return sprintf(buf, "%#06x %#04x\n", tcdm_wregb_last, db8500_prcmu_tcdm_readb(tcdm_wregb_last));
+}
+
+static ssize_t tcdm_wregb_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
+{
+	int reg, val;
+
+	if (sscanf(buf, "%x %x", &reg, &val) == 2) {
+		tcdm_wregb_last = reg;
+		db8500_prcmu_tcdm_writeb(reg, val);
+
+		pr_err("[prcmu-dbg] %#06x: %#04x\n", reg, val);
+	}
+
+	return -EINVAL;
+}
+
+static struct kobj_attribute tcdm_wregb_interface = __ATTR(tcdm_wregb, 0600, tcdm_wregb_show, tcdm_wregb_store);
+
+static ssize_t tcdm_rregl_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	return sprintf(buf, "%#06x %#010x\n", tcdm_rregl_last, db8500_prcmu_tcdm_readl(tcdm_rregl_last));
+}
+
+static ssize_t tcdm_rregl_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
+{
+	int reg;
+
+	if (sscanf(buf, "%x", &reg))
+		tcdm_rregl_last = reg;
+	
+	return count;
+}
+
+static struct kobj_attribute tcdm_rregl_interface = __ATTR(tcdm_rregl, 0600, tcdm_rregl_show, tcdm_rregl_store);
+
+static ssize_t tcdm_wregl_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	return sprintf(buf, "%#06x %#010x\n", tcdm_wregl_last, db8500_prcmu_tcdm_readl(tcdm_wregl_last));
+}
+
+static ssize_t tcdm_wregl_store(struct kobject *kobj, struct kobj_attribute *attr, const char *buf, size_t count)
+{
+	int reg, val;
+
+	if (sscanf(buf, "%x %x", &reg, &val) == 2) {
+		tcdm_wregl_last = reg;
+		db8500_prcmu_tcdm_writel(reg, val);
+
+		pr_err("[prcmu-dbg] %#06x: %#010x\n", reg, val);
+	}
+
+	return -EINVAL;
+}
+
+static struct kobj_attribute tcdm_wregl_interface = __ATTR(tcdm_wregl, 0600, tcdm_wregl_show, tcdm_wregl_store);
 
 static struct attribute *prcmu_sysfs_debug_attrs[] = {
+	&prcmu_rreg_interface.attr, 
 	&prcmu_wreg_interface.attr, 
+	&tcdm_rregb_interface.attr, 
+	&tcdm_wregb_interface.attr, 
+	&tcdm_rregl_interface.attr, 
+	&tcdm_wregl_interface.attr, 
 	NULL,
 };
 
@@ -1155,6 +1321,8 @@ static __init int prcmu_debug_debugfs_init(void)
 	int ret;
 
 	ret = setup_debugfs();
+	ret = setup_sysfs();
+
 	return ret;
 }
 late_initcall(prcmu_debug_debugfs_init);
