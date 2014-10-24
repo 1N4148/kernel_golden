@@ -1063,16 +1063,11 @@ static void db8500_prcmu_get_abb_event_buffer(void __iomem **buf)
 
 #define LIVEOPP_VER		"2.2"
 
-#define NOCHG			0
-#define SET_PLL			1
-#define SET_EXT			1
-#define SET_VOLT		1
-
 struct mutex liveopp_lock;
 
 static unsigned int last_arm_idx = 0;
 
-#if LIVEOPP_DEBUG > 1
+#if CONFIG_LIVEOPP_DEBUG > 1
 static int liveopp_start = 0;
 #endif
 
@@ -1086,7 +1081,7 @@ static int liveopp_start = 0;
 
 static struct liveopp_arm_table liveopp_arm[] = {
 //	| CLK            | PLL       | VDD | VBB | DDR | APE |
-	{ 50000,    46080, 0x00050106, 0x12, 0xDB,  25, 25},
+	{ 50000,    46080, 0x00050106, 0x14, 0xDB,  25,  25},
 	{ 100000,   99840, 0x0005010D, 0x16, 0xDB,  25,  25},
 	{ 200000,  199680, 0x0005011A, 0x18, 0xDB,  25,  25},
 	{ 300000,  299520, 0x00050127, 0x19, 0xDB,  25,  25},
@@ -1100,7 +1095,7 @@ static struct liveopp_arm_table liveopp_arm[] = {
 	{1050000, 1049600, 0x00050188, 0x2F, 0xDB, 100, 100},
 	{1100000, 1098240, 0x0005018F, 0x34, 0xDB, 100, 100},
 	{1150000, 1152000, 0x00050196, 0x34, 0x8F, 100, 100},
-	{1200000, 1198080, 0x0005019C, 0x3A, 0xCF, 100, 100},
+	{1200000, 1198080, 0x0005019C, 0x3C, 0xCF, 100, 100},
 };
 
 static const char *armopp_name[] = 
@@ -1373,7 +1368,7 @@ ARM_STEP(arm_step12, 12);
 ARM_STEP(arm_step13, 13);
 ARM_STEP(arm_step14, 14);
 
-#if LIVEOPP_DEBUG > 1
+#if CONFIG_LIVEOPP_DEBUG > 1
 static ssize_t liveopp_start_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)		
 {
 	return sprintf(buf, "%d\n", liveopp_start);
@@ -1388,7 +1383,7 @@ ATTR_RW(liveopp_start);
 #endif
 
 static struct attribute *liveopp_attrs[] = {
-#if LIVEOPP_DEBUG > 1
+#if CONFIG_LIVEOPP_DEBUG > 1
 	&liveopp_start_interface.attr, 
 #endif
 	&version_interface.attr,
@@ -1531,12 +1526,12 @@ static int arm_set_rate(unsigned long rate)
 	unsigned long frequency = rate / 1000;
 	int i;
 
-#if LIVEOPP_DEBUG > 1
+#if CONFIG_LIVEOPP_DEBUG > 1
 	if (!liveopp_start)
 		return 0;
 #endif
 
-#if LIVEOPP_DEBUG > 0
+#if CONFIG_LIVEOPP_DEBUG > 0
 	pr_info("kHz: %10lu\n", frequency);
 #endif
 
