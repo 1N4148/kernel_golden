@@ -10,10 +10,14 @@ obj-$(CONFIG_CPU_FREQ_GOV_USERSPACE)    += cpufreq_userspace.o
 obj-$(CONFIG_CPU_FREQ_GOV_ONDEMAND)     += cpufreq_ondemand.o
 obj-$(CONFIG_CPU_FREQ_GOV_CONSERVATIVE)	+= cpufreq_conservative.o
 obj-$(CONFIG_CPU_FREQ_GOV_INTERACTIVE)  += cpufreq_interactive.o
+obj-$(CONFIG_CPU_FREQ_GOV_INTERACTIVEQ) += cpufreq_interactiveq.o
 obj-$(CONFIG_CPU_FREQ_GOV_HOTPLUG)      += cpufreq_hotplug.o
-obj-$(CONFIG_CPU_FREQ_GOV_SAKURACTIVE)	+= cpufreq_sakuractive.o
 obj-$(CONFIG_CPU_FREQ_GOV_PEGASUSQ)     += cpufreq_pegasusq.o
-obj-$(CONFIG_CPU_FREQ_GOV_ZENX)					+= cpufreq_zenx.o
+obj-$(CONFIG_CPU_FREQ_GOV_SAKURACTIVE)	+= cpufreq_sakuractive.o
+obj-$(CONFIG_CPU_FREQ_GOV_INTELLIACTIVE)+= cpufreq_intelliactive.o
+obj-$(CONFIG_CPU_FREQ_GOV_ZENERACTIVE)  += cpufreq_zeneractive.o
+obj-$(CONFIG_CPU_FREQ_GOV_ZENX)    	+= cpufreq_zenx.o
+obj-$(CONFIG_CPU_FREQ_GOV_LULZACTIVEQ)	+= cpufreq_lulzactiveq.o
 obj-$(CONFIG_CPU_FREQ_GOV_ABYSSPLUG)    += cpufreq_abyssplug.o
 
 # CPUfreq cross-arch helpers
