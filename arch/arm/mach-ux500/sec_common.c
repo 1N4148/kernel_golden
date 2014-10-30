@@ -825,8 +825,8 @@ static int sec_policy_notifier(struct notifier_block *nb,
 	if (val == CPUFREQ_NOTIFY)
 		printk(KERN_INFO "DVFS Governor Policy set to - %s\n", policy->governor->name);
 
-	return 0;
 */
+	return 0;
 }
 #endif
 

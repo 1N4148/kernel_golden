@@ -61,7 +61,7 @@
 #include <wl_cfgp2p.h>
 #include <wl_android.h>
 
-/*PM mode in userspace */
+/* PM mode in userspace */
 static bool dhdpm_fast = true;
 module_param(dhdpm_fast, bool, 0644);
 
@@ -3820,7 +3820,6 @@ wl_cfg80211_set_power_mgmt(struct wiphy *wiphy, struct net_device *dev,
 	} else {
 		pm = enabled ? ((dhd->in_suspend) ? PM_MAX : PM_FAST) : PM_OFF;
 	}
-	
 	if (_net_info->pm_block || wl->vsdb_mode) {
 		/* Do not enable the power save if it is p2p interface or vsdb mode is set */
 		WL_DBG(("%s:Do not enable the power save for pm_block %d or vsdb_mode %d\n",
