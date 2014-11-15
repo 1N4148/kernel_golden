@@ -1087,8 +1087,7 @@ static struct liveopp_arm_table liveopp_arm[] = {
 	{ 800000,  798720, 0x00050168, 0x24, 0xDB, 100,  50},
 	{1000000,  998400, 0x00050182, 0x2F, 0xDB, 100, 100},
 	{1100000, 1098240, 0x0005018F, 0x34, 0xDB, 100, 100},
-	{1150000, 1152000, 0x00050196, 0x34, 0xCF, 100, 100},
-	{1200000, 1198080, 0x0005019C, 0x3A, 0xDF, 100, 100},
+	{1200000, 1198080, 0x0005019C, 0x35, 0xFF, 100, 100},
 };
 
 static const char *armopp_name[] = 
@@ -1352,8 +1351,8 @@ ARM_STEP(arm_step03, 3);
 ARM_STEP(arm_step04, 4);
 ARM_STEP(arm_step05, 5);
 ARM_STEP(arm_step06, 6);
-ARM_STEP(arm_step07, 7);
-/* ARM_STEP(arm_step08, 8);
+/* ARM_STEP(arm_step07, 7);
+ARM_STEP(arm_step08, 8);
 ARM_STEP(arm_step09, 9);
 ARM_STEP(arm_step10, 10);
 ARM_STEP(arm_step11, 11);
@@ -1390,8 +1389,8 @@ static struct attribute *liveopp_attrs[] = {
 	&arm_step04_interface.attr,
 	&arm_step05_interface.attr,
 	&arm_step06_interface.attr,
-	&arm_step07_interface.attr,
-/*	&arm_step08_interface.attr,
+/*	&arm_step07_interface.attr,
+	&arm_step08_interface.attr,
 	&arm_step09_interface.attr,
 	&arm_step10_interface.attr,
 	&arm_step11_interface.attr,
