@@ -859,7 +859,7 @@ static int mxt_multi_touchscreen_msg_handler(struct mxt_data *data,
 					(char *)client->name,
 					PRCMU_QOS_DDR_OPP_MAX);
 				prcmu_qos_update_requirement(PRCMU_QOS_ARM_KHZ,
-					(char *)client->name, 800000);
+					(char *)client->name, 600000);
 			}
 #endif
 
