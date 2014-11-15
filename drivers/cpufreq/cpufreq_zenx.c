@@ -81,13 +81,13 @@ static spinlock_t hotplug_remove_cpumask_lock;
 static unsigned int hispeed_freq;
 
 /* Go to hi speed when CPU load at or above this value. */
-#define DEFAULT_GO_HISPEED_LOAD 99
+#define DEFAULT_GO_HISPEED_LOAD 95
 static unsigned long go_hispeed_load = DEFAULT_GO_HISPEED_LOAD;
 
 /* Unplug auxillary CPUs below these values. */
-#define DEFAULT_UNPLUG_LOAD_CPU1 35
-#define DEFAULT_UNPLUG_LOAD_CPU2 50
-#define DEFAULT_UNPLUG_LOAD_CPUMORE 70
+#define DEFAULT_UNPLUG_LOAD_CPU1 0
+#define DEFAULT_UNPLUG_LOAD_CPU2 0
+#define DEFAULT_UNPLUG_LOAD_CPUMORE 0
 
 static unsigned int unplug_load[] =
 	{ DEFAULT_UNPLUG_LOAD_CPU1,
@@ -106,14 +106,14 @@ static int ntarget_loads = ARRAY_SIZE(default_target_loads);
  * Number of sampling periods to take average CPU load across
  * for CPU removal.
  */
-#define DEFAULT_NR_REMOVE_PERIODS (75)
+#define DEFAULT_NR_REMOVE_PERIODS (70)
 static unsigned int hot_remove_sampling_periods = DEFAULT_NR_REMOVE_PERIODS;
 
 /*
  * Number of sampling periods to take average CPU load across
  * for CPU add.
  */
-#define DEFAULT_NR_ADD_PERIODS (60)
+#define DEFAULT_NR_ADD_PERIODS (40)
 static unsigned int hot_add_sampling_periods = DEFAULT_NR_ADD_PERIODS;
 
 /*
@@ -125,7 +125,7 @@ static unsigned long min_sample_time = DEFAULT_MIN_SAMPLE_TIME;
 /*
  * The sample rate of the timer used to increase frequency
  */
-#define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
+#define DEFAULT_TIMER_RATE (30 * USEC_PER_MSEC)
 static unsigned long timer_rate = DEFAULT_TIMER_RATE;
 
 /*

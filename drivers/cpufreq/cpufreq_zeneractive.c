@@ -75,7 +75,7 @@ static spinlock_t hotplug_cpumask_lock;
 /* used for suspend code */
 static unsigned int suspended = 0;
 static unsigned int enabled = 0;
-static unsigned int suspendfreq = 729600;
+static unsigned int suspendfreq = 800000;
 static unsigned int registration = 0;
 
 /* Hi speed to bump to from lo speed when load burst (default max) */
@@ -86,9 +86,9 @@ static unsigned int hispeed_freq;
 static unsigned long go_hispeed_load;
 
 /* Unplug auxillary CPUs below these values. */
-#define DEFAULT_UNPLUG_LOAD_CPU1 25
-#define DEFAULT_UNPLUG_LOAD_CPU2 60
-#define DEFAULT_UNPLUG_LOAD_CPU3 75
+#define DEFAULT_UNPLUG_LOAD_CPU1 0
+#define DEFAULT_UNPLUG_LOAD_CPU2 0
+#define DEFAULT_UNPLUG_LOAD_CPU3 0
 
 static unsigned int unplug_load[3];
 
@@ -115,7 +115,7 @@ static unsigned long min_sample_time;
 /*
  * The sample rate of the timer used to increase frequency
  */
-#define DEFAULT_TIMER_RATE 20 * USEC_PER_MSEC
+#define DEFAULT_TIMER_RATE 30 * USEC_PER_MSEC
 static unsigned long timer_rate;
 
 static bool governidle;
