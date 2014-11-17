@@ -2024,7 +2024,7 @@ static irqreturn_t ab8500_fg_lowbatf_handler(int irq, void *_di)
 	   if not already initiated. */
 	if (!di->flags.low_bat_delay) {
 
-		wake_lock_timeout(&di->lowbat_wake_lock, 20 * HZ);
+		wake_lock_timeout(&di->lowbat_wake_lock, 5 * HZ);
 		dev_warn(di->dev, "Battery voltage is below LOW threshold\n");
 		di->flags.low_bat_delay = true;
 		/*
