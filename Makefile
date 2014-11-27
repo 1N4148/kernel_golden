@@ -195,7 +195,7 @@ export KBUILD_BUILDHOST := $(SUBARCH)
 #ARCH		?= $(SUBARCH)
 #CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 
-ARCH := arm
+#ARCH := arm
 #CROSS_COMPILE := /home/marcin/Dokumenty/novatp_arm-eabi-4.9/bin/arm-eabi-
 
 # Architecture as present in compile.h

@@ -1081,13 +1081,17 @@ static int liveopp_start = 0;
 
 static struct liveopp_arm_table liveopp_arm[] = {
 //	| CLK            | PLL       | VDD | VBB | DDR | APE |
-	{ 200000,  199680, 0x0005011A, 0x16, 0xDB,  25,  25},
-	{ 400000,  399360, 0x00050134, 0x1A, 0xDB,  25,  50},
-	{ 600000,  599040, 0x0005014E, 0x20, 0xDB,  50,  50},
-	{ 800000,  798720, 0x00050168, 0x24, 0xDB, 100,  50},
-	{1000000,  998400, 0x00050182, 0x2F, 0xDB, 100, 100},
-	{1100000, 1098240, 0x0005018F, 0x34, 0xDB, 100, 100},
-	{1200000, 1198080, 0x0005019C, 0x35, 0xFF, 100, 100},
+	{ 200000,  199680, 0x0005011A, 0x18, 0xBD,  25,  25}, // VARM_RET
+	{ 300000,  299520, 0x00050127, 0x18, 0xBD,  25,  25},
+	{ 400000,  399360, 0x00050134, 0x32, 0xBD,  25,  50}, // VARM_50
+	{ 500000,  499200, 0x00050141, 0x32, 0xBD,  25,  50},
+	{ 600000,  599040, 0x0005014E, 0x4C, 0xBD,  50,  50},
+	{ 700000,  698880, 0x0005015B, 0x4C, 0xBD,  50,  50},
+	{ 800000,  798720, 0x00050168, 0x5A, 0xBD, 100,  50}, // VARM_100
+	{ 900000,  898560, 0x00050175, 0x5A, 0xBD, 100,  50},
+	{1000000,  998400, 0x00050182, 0x5A, 0xBD, 100, 100}, 
+	{1100000, 1098240, 0x0005018F, 0xF8, 0xCD, 100, 100}, // VARM_MAX
+	{1200000, 1198080, 0x0005019C, 0xF8, 0xFF, 100, 100},
 };
 
 static const char *armopp_name[] = 
@@ -1104,7 +1108,7 @@ static const char *armopp_name[] =
 
 static int varm_uv(u8 raw)
 {
-	if (raw <= 0x35) {
+	if (raw <= 0x7f) {
 		return (AB8500_VARM_MIN_UV + (raw * AB8500_VARM_STEP_UV));
 	} else {
 		return AB8500_VARM_MAX_UV;
@@ -1351,14 +1355,10 @@ ARM_STEP(arm_step03, 3);
 ARM_STEP(arm_step04, 4);
 ARM_STEP(arm_step05, 5);
 ARM_STEP(arm_step06, 6);
-/* ARM_STEP(arm_step07, 7);
+ARM_STEP(arm_step07, 7);
 ARM_STEP(arm_step08, 8);
 ARM_STEP(arm_step09, 9);
 ARM_STEP(arm_step10, 10);
-ARM_STEP(arm_step11, 11);
-ARM_STEP(arm_step12, 12);
-ARM_STEP(arm_step13, 13);
-ARM_STEP(arm_step14, 14); */
 
 #if CONFIG_LIVEOPP_DEBUG > 1
 static ssize_t liveopp_start_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)		
@@ -1433,11 +1433,11 @@ static struct attribute *liveopp_attrs[] = {
 	&arm_step04_interface.attr,
 	&arm_step05_interface.attr,
 	&arm_step06_interface.attr,
-/*	&arm_step07_interface.attr,
+	&arm_step07_interface.attr,
 	&arm_step08_interface.attr,
 	&arm_step09_interface.attr,
 	&arm_step10_interface.attr,
-	&arm_step11_interface.attr,
+/*	&arm_step11_interface.attr,
 	&arm_step12_interface.attr,
 	&arm_step13_interface.attr,
 	&arm_step14_interface.attr, */
