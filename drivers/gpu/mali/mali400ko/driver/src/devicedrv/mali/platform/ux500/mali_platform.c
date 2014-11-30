@@ -40,7 +40,7 @@
 #define MALI_HIGH_TO_LOW_LEVEL_UTILIZATION_LIMIT 64
 #define MALI_LOW_TO_HIGH_LEVEL_UTILIZATION_LIMIT 192
 
-#define MALI_UX500_VERSION		"1.1.1"
+#define MALI_UX500_VERSION		"1.1.3"
 
 #define MALI_MAX_UTILIZATION		256
 
@@ -100,6 +100,11 @@ static struct wake_lock wakelock;
 static u32 boost_low 		= 0;
 static u32 boost_high 		= 0;
 static u32 boost_cur		= 0;
+
+static u32 boost_stat[15];
+static u32 boost_stat_opp50	= 0;
+static u32 boost_stat_total	= 0;
+
 //mutex to protect above variables
 static DEFINE_MUTEX(mali_boost_lock);
 
@@ -336,6 +341,13 @@ void mali_utilization_function(struct work_struct *ptr)
 			}
 		}
 	}
+	// update stats, count time in opp50 seperately
+	if (has_requested_low) {
+		boost_stat_opp50++;
+	} else {	
+		boost_stat[boost_cur]++;
+	}
+	boost_stat_total++;
 	mutex_unlock(&mali_boost_lock);
 }
 
@@ -613,12 +625,25 @@ static ssize_t mali_available_frequencies_show(struct kobject *kobj, struct kobj
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(mali_dvfs); i++) {
-		sprintf(buf, "%s%u\n", buf, mali_dvfs[i].freq);
+		sprintf(buf, "%s%6u\n", buf, mali_dvfs[i].freq);
 	}
-
 	return strlen(buf);
 }
 ATTR_RO(mali_available_frequencies);
+
+static ssize_t mali_stats_show(struct kobject *kobj, struct kobj_attribute *attr, char *buf)
+{
+	int i;
+	if (boost_stat_total == 0) boost_stat_total = 1; // prevent div by 0
+	sprintf(buf, "%s OPP50 %10u %3u%%\n", buf, boost_stat_opp50, boost_stat_opp50*100/boost_stat_total);
+	for (i = 0; i < ARRAY_SIZE(mali_dvfs); i++) {
+		if (boost_stat[i]) {
+			sprintf(buf, "%s%6u %10u %3u%%\n", buf, mali_dvfs[i].freq, boost_stat[i], boost_stat[i]*100/boost_stat_total);
+		}
+	}
+	return strlen(buf);
+}
+ATTR_RO(mali_stats);
 
 static struct attribute *mali_attrs[] = {
 	&version_interface.attr, 
@@ -630,7 +655,8 @@ static struct attribute *mali_attrs[] = {
 	&mali_boost_low_interface.attr, 
 	&mali_boost_high_interface.attr, 
 	&mali_dvfs_config_interface.attr, 
-	&mali_available_frequencies_interface.attr, 
+	&mali_available_frequencies_interface.attr,
+	&mali_stats_interface.attr, 
 	NULL,
 };
 
