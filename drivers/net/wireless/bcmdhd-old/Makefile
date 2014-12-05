@@ -38,7 +38,7 @@ DHDCFLAGS += -DESCAN_RESULT_PATCH
 DHDCFLAGS += -DDUAL_ESCAN_RESULT_BUFFER
 
 DHDCFLAGS += -DROAM_ENABLE -DROAM_CHANNEL_CACHE -DROAM_API
-DHDCFLAGS += -DDISABLE_FW_ROAM_SUSPEND
+DHDCFLAGS += -DENABLE_FW_ROAM_SUSPEND
 
 # For Static Buffer
 ifeq ($(CONFIG_BROADCOM_WIFI_RESERVED_MEM),y)
@@ -204,8 +204,8 @@ DHDOFILES :=$(filter-out bcmsdh_sdmmc.o,$(DHDOFILES))
 DHDOFILES :=$(filter-out bcmsdh_sdmmc_linux.o,$(DHDOFILES))
 endif
 
-dhd_old-y := $(DHDOFILES)
-obj-m   += dhd_old.o
+dhd-y := $(DHDOFILES)
+obj-m   += dhd.o
 
 all:
 	@echo "$(MAKE) --no-print-directory -C $(KDIR) SUBDIRS=$(CURDIR) modules"
