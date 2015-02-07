@@ -19,10 +19,7 @@ mv .git .git-halt
 
 export ARCH=arm
 
-if [ ! -f $KERNELDIR/.config ];
-then
-  make defconfig cm_golden_defconfig
-fi
+make defconfig cm_golden_defconfig
 
 . $KERNELDIR/.config
 
