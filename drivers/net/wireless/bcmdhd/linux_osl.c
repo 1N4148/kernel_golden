@@ -21,7 +21,7 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
- * $Id: linux_osl.c 361207 2012-10-06 05:59:08Z $
+ * $Id: linux_osl.c 372888 2012-12-05 06:56:47Z $
  */
 
 #define LINUX_PORT
@@ -34,10 +34,6 @@
 #include <bcmutils.h>
 #include <linux/delay.h>
 #include <pcicfg.h>
-
-#ifdef BCMASSERT_LOG
-#include <bcm_assert_log.h>
-#endif
 
 
 #include <linux/fs.h>
@@ -189,7 +185,8 @@ osl_attach(void *pdev, uint bustype, bool pkttag)
 {
 	osl_t *osh;
 
-	osh = kmalloc(sizeof(osl_t), GFP_ATOMIC);
+	if (!(osh = kmalloc(sizeof(osl_t), GFP_ATOMIC)))
+		return osh;
 
 	ASSERT(osh);
 
@@ -997,12 +994,10 @@ osl_assert(const char *exp, const char *file, int line)
 	if (!basename)
 		basename = file;
 
-#ifdef BCMASSERT_LOG
 	snprintf(tempbuf, 64, "\"%s\": file \"%s\", line %d\n",
 		exp, basename, line);
 
-	bcm_assert_log(tempbuf);
-#endif 
+	printk("%s", tempbuf);
 
 
 }

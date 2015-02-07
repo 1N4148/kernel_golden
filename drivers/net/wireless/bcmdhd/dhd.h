@@ -58,7 +58,6 @@ int setScheduler(struct task_struct *p, int policy, struct sched_param *param);
 #include <wlioctl.h>
 #include <wlfc_proto.h>
 
-#include <dhd_sec_feature.h>
 
 #if defined(CUSTOMER_HW4_RELEASE)
 /* Customer requirement */
@@ -410,7 +409,7 @@ inline static void MUTEX_UNLOCK_SOFTAP_SET(dhd_pub_t * dhdp)
 #define DHD_OS_WAKE_LOCK_CTRL_TIMEOUT_ENABLE(pub, val) \
 	dhd_os_wake_lock_ctrl_timeout_enable(pub, val)
 #endif /* DHD_DEBUG_WAKE_LOCK */
-#define DHD_PACKET_TIMEOUT_MS	1000
+#define DHD_PACKET_TIMEOUT_MS	500
 #define DHD_EVENT_TIMEOUT_MS	1500
 
 #if defined(CUSTOMER_HW4) && defined(PNO_SUPPORT)
