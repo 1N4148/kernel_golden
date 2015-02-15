@@ -411,7 +411,7 @@ inline static void MUTEX_UNLOCK_SOFTAP_SET(dhd_pub_t * dhdp)
 	dhd_os_wake_lock_ctrl_timeout_enable(pub, val)
 #endif /* DHD_DEBUG_WAKE_LOCK */
 #define DHD_PACKET_TIMEOUT_MS	 500
-#define DHD_EVENT_TIMEOUT_MS	1000
+#define DHD_EVENT_TIMEOUT_MS	1500
 
 #if defined(CUSTOMER_HW4) && defined(PNO_SUPPORT)
 #define DHD_PNO_TIMEOUT_MS	10000
