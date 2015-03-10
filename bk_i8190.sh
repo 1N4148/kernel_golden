@@ -1,23 +1,7 @@
 #!/bin/sh
-
-GCC_VERSION=4.9
-GCC_TOOLCHAIN=Linaro
-
-export USE_CCACHE=1
-export CROSS_DIR=/android/arm-cortex_a9-linux-gnueabihf-linaro_4.9.3-2014.11/bin
-export CROSS_COMPILE=$CROSS_DIR/arm-eabi-
-export ARM_CROSS_COMPILE=$CROSS_COMPILE
-export ARCH=arm
-
-echo "Building I8190 CM.....";
-
 export KERNELDIR=`readlink -f .`
 
-echo $KERNELDIR
-
 mv .git .git-halt
-
-export ARCH=arm
 
 make defconfig cm_golden_defconfig
 
@@ -36,6 +20,8 @@ echo "PREPARING BUILT-PI8190 ..........."
 cd $KERNELDIR
 find -name '*.ko' -exec cp -av {} $KERNELDIR/BUILT_I8190/lib/modules/ \;
 ${CROSS_COMPILE}strip --strip-unneeded $KERNELDIR/BUILT_I8190/lib/modules/*
+
+echo "COPYING BUILT-PI8190 ..........."
 cp $KERNELDIR/arch/arm/boot/zImage $KERNELDIR/BUILT_I8190/zImage
 
 mv .git-halt .git
