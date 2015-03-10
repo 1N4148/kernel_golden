@@ -1,0 +1,80 @@
+Signature-Version: 1.0
+SHA1-Digest-Manifest-Main-Attributes: FD86xl0CwlUuXr8ewCZKnc1mQUo=
+Created-By: 1.7.0_65 (Oracle Corporation)
+SHA1-Digest-Manifest: Z6PswztiQIKsVYljJSqCoTpKUXM=
+
+Name: system/lib/modules/option.ko
+SHA1-Digest: ZYo1YuSiW091srominCUX3/DqlQ=
+
+Name: boot.img
+SHA1-Digest: gcY9DiPkqLh6uyz6Q/I+UsnazA4=
+
+Name: system/lib/modules/scsi_wait_scan.ko
+SHA1-Digest: eEbR0XlMGEUD7PYRrzHg3aaTJY8=
+
+Name: system/lib/modules/isofs.ko
+SHA1-Digest: HmT7DokFYmTrGqHxdACUEKNmpHA=
+
+Name: system/lib/modules/sunrpc.ko
+SHA1-Digest: 9XZlo7nLtKJrpAUwvYX2HO0gKhI=
+
+Name: system/lib/modules/ansi_cprng.ko
+SHA1-Digest: DIU9Gye/6goxZiqZ+r2smQoL4Gs=
+
+Name: system/lib/modules/nfs_layout_nfsv41_files.ko
+SHA1-Digest: 9KUx/4k2/J7KPkPhZpiiKa9xK58=
+
+Name: system/lib/modules/hfs.ko
+SHA1-Digest: 0JL6/J+ozYbN/iNOHrTKG9j1aMU=
+
+Name: system/lib/modules/sec_dock_keyboard.ko
+SHA1-Digest: ioZMg7Wo6jIvcseYil11aohNiGA=
+
+Name: system/etc/init.d/80_TvOut
+SHA1-Digest: 1t1aifYF08yZUm2CrSUIffPcu5Y=
+
+Name: system/lib/modules/usb_wwan.ko
+SHA1-Digest: m/f4xFZqNLlc0GQm13J9Fn5wbjE=
+
+Name: system/lib/modules/nfs.ko
+SHA1-Digest: Qf1JVT+ZE2WQL+OANqVpYisE2EU=
+
+Name: META-INF/com/google/android/update-binary
+SHA1-Digest: XhJeVkHL2MG7rN9JhhORVAuS02I=
+
+Name: system/lib/modules/cifs.ko
+SHA1-Digest: 3pXsC+PMfb5tMUyR+ZLUjN/gFe0=
+
+Name: system/lib/modules/hfsplus.ko
+SHA1-Digest: tvZMn+W+63bhPuY0I/TF/65QjGA=
+
+Name: system/etc/init.d/00_CleanOld
+SHA1-Digest: DLZ8cx/lndeKbrHTSmDKQZ39NUw=
+
+Name: META-INF/com/google/android/updater-script
+SHA1-Digest: MxKCGInkf2MDRjIEShIYrvDGIoI=
+
+Name: system/lib/hw/vendor-camera.piranha.so
+SHA1-Digest: s10afYHdJVjeR3YW+cXVBE+b8sA=
+
+Name: system/lib/modules/auth_rpcgss.ko
+SHA1-Digest: /7bC+x7zO7IP/nGhanwgb8zaNzU=
+
+Name: system/lib/modules/ppp_async.ko
+SHA1-Digest: d9xKqQT2tmLMFFPzPjEBzhf+J04=
+
+Name: system/lib/modules/dhd.ko
+SHA1-Digest: +orqeE4Y6kwQXIUggcraEOkGljo=
+
+Name: system/lib/modules/udf.ko
+SHA1-Digest: JbqUTJoME0ui13hwD2nwIoomWfg=
+
+Name: system/lib/modules/pvrsrvkm_sgx540_120.ko
+SHA1-Digest: FfPpTAr9xlZWr5ZmKI71uGRc8Fg=
+
+Name: system/lib/modules/lockd.ko
+SHA1-Digest: Vvw4y1H+gnswh1YXYbUJCrhUz3w=
+
+Name: system/lib/modules/crc-itu-t.ko
+SHA1-Digest: BH7wCzQ8BDD/nOqdoLCDZYvsALI=
+

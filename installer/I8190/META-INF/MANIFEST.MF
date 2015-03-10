@@ -1,0 +1,78 @@
+Manifest-Version: 1.0
+Created-By: 1.7.0_65 (Oracle Corporation)
+
+Name: system/lib/modules/option.ko
+SHA1-Digest: 9vvTutqsp6Oxrg2Y1yzCJyBfAhY=
+
+Name: boot.img
+SHA1-Digest: JVM3qdnq5k0ySV7c+nNgx1G+Ws4=
+
+Name: system/lib/modules/scsi_wait_scan.ko
+SHA1-Digest: bpGW67sK3ElLtRWULdFmYTk3W38=
+
+Name: system/lib/modules/isofs.ko
+SHA1-Digest: omscO0grj2Gba1LbGl7shqPYpdg=
+
+Name: system/lib/modules/sunrpc.ko
+SHA1-Digest: OKG97+G2VJZ50Z3ceW318p/2jAU=
+
+Name: system/lib/modules/ansi_cprng.ko
+SHA1-Digest: r6YDVMUKqTU7jRZHxh6+RHCx5+w=
+
+Name: system/lib/modules/nfs_layout_nfsv41_files.ko
+SHA1-Digest: ncLtWFHs1AUcGPpUXihLsO1mzFc=
+
+Name: system/lib/modules/hfs.ko
+SHA1-Digest: 0y72G1oitSaN01wYuYG5sCsAq1k=
+
+Name: system/lib/modules/sec_dock_keyboard.ko
+SHA1-Digest: l08oMAjCu3OnS28jyxhzkPoi8Go=
+
+Name: system/etc/init.d/80_TvOut
+SHA1-Digest: tCP8WshGbms7xNUgkQYGYDl2Euw=
+
+Name: system/lib/modules/usb_wwan.ko
+SHA1-Digest: 4M0/yGOuk1s1frwERKEpubWmRFE=
+
+Name: system/lib/modules/nfs.ko
+SHA1-Digest: K0rUm9osQO3dkxTN7abyOXydtp0=
+
+Name: META-INF/com/google/android/update-binary
+SHA1-Digest: 9p0yT9RRWdC5NymNPh1V5mYCLsM=
+
+Name: system/lib/modules/cifs.ko
+SHA1-Digest: eTW6HBGxGeU0CeNuDzF0GSq82pw=
+
+Name: system/lib/modules/hfsplus.ko
+SHA1-Digest: EGSIraFePWtBfqC33myE/DrdD4A=
+
+Name: system/etc/init.d/00_CleanOld
+SHA1-Digest: XL8q/Xp5jLMngshlYU3ePEbS1t4=
+
+Name: META-INF/com/google/android/updater-script
+SHA1-Digest: twq2wtfHhZtl7Xvg3vQEosS0gyg=
+
+Name: system/lib/hw/vendor-camera.piranha.so
+SHA1-Digest: dIim+p37KN6gcTxVhHTyuP+nnjM=
+
+Name: system/lib/modules/auth_rpcgss.ko
+SHA1-Digest: nY9B7QCBrI8RYJvXIVUyeaDLtgs=
+
+Name: system/lib/modules/ppp_async.ko
+SHA1-Digest: J/g2TZjG9utWOQNoufAG8xggF+s=
+
+Name: system/lib/modules/udf.ko
+SHA1-Digest: fHEpTC/RJnBmIOomvmzT0nls1IM=
+
+Name: system/lib/modules/dhd.ko
+SHA1-Digest: Spxn7K6ntT9qlJLm8smmxRokeR4=
+
+Name: system/lib/modules/pvrsrvkm_sgx540_120.ko
+SHA1-Digest: cdb7dI2xeDaj7e8TrY6k+DhTrNA=
+
+Name: system/lib/modules/lockd.ko
+SHA1-Digest: 0/CAH7BhfKBZqQxf8SHgI/HzBAE=
+
+Name: system/lib/modules/crc-itu-t.ko
+SHA1-Digest: YD8hMVEwwMH7wAWAbR8yif++n4A=
+

@@ -1,0 +1,23 @@
+<@center><b>ANYKERNEL-Installer v1.6</b></@>
+<@center><b>Changes on 3.0.31 Kernel (stable)</b></@>
+<@center>Apply "GT-I8190_JB_Opensource_Update2"</@>
+<@center>bcmdhd: Filter multicast packages while suspended</@>
+<@center>Sakuractive and SmartassV2 Governor</@>
+<@center>Add SIO I/O Scheduler</@>
+<@center></@>
+
+<@center><b>Changes on 3.0.44 Kernel (beta)</b></@>
+<@center>Sakuractive and SmartassV2 Governor</@>
+<@center>Add SIO I/O Scheduler</@>
+<@center></@>
+
+<@center><b>ANYKERNEL-Installer v1.5</b></@>
+<@center><b>Changes on 3.0.44 Kernel 2 (beta)</b></@>
+<@center>bcmdhd: Filter multicast packages while suspended</@>
+<@center>bcmdhd: workaround broken AC video queue in IBSS mode</@>
+<@center></@>
+
+<@center><b>ANYKERNEL-Installer v1.4</b></@>
+<@center><b>Includes 3.0.31 Kernel (stable)</b></@>
+<@center><b>Includes 3.0.44 Kernel 2 (beta, incl. JB Update 2 changes)</b></@>
+
