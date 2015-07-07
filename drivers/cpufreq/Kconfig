@@ -395,6 +395,13 @@ config CPU_FREQ_GOV_ZZMOOVE
 		
 	  If in doubt, say N.
 
+config CPU_FREQ_GOV_SMARTASSV2
+        tristate "'SmartAss V2' cpufreq governor"
+        depends on CPU_FREQ 
+        help	
+		
+	  If in doubt, say N.
+
 menu "x86 CPU frequency scaling drivers"
 depends on X86
 source "drivers/cpufreq/Kconfig.x86"

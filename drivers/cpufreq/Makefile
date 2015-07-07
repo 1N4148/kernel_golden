@@ -20,6 +20,7 @@ obj-$(CONFIG_CPU_FREQ_GOV_ZENX)    	+= cpufreq_zenx.o
 obj-$(CONFIG_CPU_FREQ_GOV_LULZACTIVEQ)	+= cpufreq_lulzactiveq.o
 obj-$(CONFIG_CPU_FREQ_GOV_ABYSSPLUG)    += cpufreq_abyssplug.o
 obj-$(CONFIG_CPU_FREQ_GOV_ZZMOOVE)    	+= cpufreq_zzmoove.o
+obj-$(CONFIG_CPU_FREQ_GOV_SMARTASSV2)  	+= cpufreq_smartassv2.o
 
 # CPUfreq cross-arch helpers
 obj-$(CONFIG_CPU_FREQ_TABLE)            += freq_table.o
